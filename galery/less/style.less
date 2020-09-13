@@ -1,0 +1,60 @@
+// out: ../css/style.css, compress: false, strictMath: true
+
+.container {
+	text-align: center;
+	background-color: #eeeeee;
+}
+
+.carousel {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0 150px 0 150px;
+	box-sizing: border-box;
+
+	&-wrap {
+		display: flex;
+		width: 100%;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	&-switch {
+		display: block;
+
+		&-svg {
+			fill: #baab9a;
+
+			&:hover {
+				fill: #fff;
+			}
+
+			&:active {
+				fill: red;
+			}
+		}
+	}
+
+	&-pic {
+		display: block;
+		outline: 1px solid black;
+		-webkit-transition: opacity 1s;
+		-moz-transition: opacity 1s;
+		-o-transition: opacity 1s;
+		transition: opacity 1s;
+	}
+
+	&-gallery {
+		border: 1px solid black;
+		width: 90%;
+		margin: 20px 0;
+		min-height: 100px;
+		display: flex;
+		align-items: center;
+		&-item{
+			margin: 20px auto;
+			width: 80px;
+			height: 80px;
+		}
+	}
+}
