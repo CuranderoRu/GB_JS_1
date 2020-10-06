@@ -1,2 +1,58 @@
 // out: ../css/style.css, compress: false, strictMath: true
 
+.container {
+    width: 1230px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.gallery {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+
+    &-img {
+        border: 1px solid black;
+        margin: 30px;
+        width: 120px;
+        min-height: 120px;
+        background-repeat: no-repeat;
+        background-origin: border-box;
+        background-position: center;
+    }
+}
+
+#img1{
+    background-image: url('../img/small/01.jpg');
+}
+
+.carousel {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    margin: 40px;
+    min-height: 180px;
+    &-switch {
+        display: block;
+
+        &-svg {
+            fill: #baab9a;
+
+            &:hover {
+                fill: green;
+            }
+
+            &:active {
+                fill: red;
+            }
+        }
+
+    }
+    &-content{
+        width: 60%;
+        border: 1px solid black;
+        margin: 0 40px;
+        min-height: 200px;
+    }
+}
