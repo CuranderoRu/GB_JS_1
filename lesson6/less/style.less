@@ -1,2 +1,56 @@
 // out: ../css/style.css, compress: false, strictMath: true
 
+.container {
+    width: 1230px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.gallery {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+
+    &-img {
+        border: 1px solid #bfbcbc;
+        margin: 30px;
+        width: 120px;
+        min-height: 120px;
+        background-repeat: no-repeat;
+        background-origin: border-box;
+        background-size: cover;
+        background-position: center;
+    }
+}
+
+.carousel {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    margin: 40px 0;
+    &-switch {
+        display: block;
+
+        &-svg {
+            fill: #baab9a;
+
+            &:hover {
+                fill: green;
+            }
+
+            &:active {
+                fill: red;
+            }
+        }
+
+    }
+    &-content{
+//        border: 1px solid black;
+        margin: 0 100px;
+    }
+}
+
+.boxShadow {
+  box-shadow: 8px -12px 7px 4px rgb(195 73 73 / 20%);
+}
