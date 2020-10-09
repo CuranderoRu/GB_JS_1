@@ -1,12 +1,13 @@
 // Глобальные переменные:
-var FIELD_SIZE_X = 20;//строки
-var FIELD_SIZE_Y = 20;//столбцы
+var FIELD_SIZE_X = 20; //строки
+var FIELD_SIZE_Y = 20; //столбцы
 var SNAKE_SPEED = 200; // Интервал между перемещениями змейки
 var snake = []; // Сама змейка
 var direction = 'y+'; // Направление движения змейки
 var gameIsRunning = false; // Запущена ли игра
 var snake_timer; // Таймер змейки
 var food_timer; // Таймер для еды
+var bomb_timer; // Таймер для еды
 var score = 0; // Результат
 
 function init() {
@@ -15,7 +16,7 @@ function init() {
     var wrap = document.getElementsByClassName('wrap')[0];
     // Подгоняем размер контейнера под игровое поле
 
-	/*
+    /*
 	if (16 * (FIELD_SIZE_X + 1) < 380) {
         wrap.style.width = '380px';
     }
@@ -28,8 +29,33 @@ function init() {
     document.getElementById('snake-start').addEventListener('click', startGame);
     document.getElementById('snake-renew').addEventListener('click', refreshGame);
 
-// Отслеживание клавиш клавиатуры
+    // Отслеживание клавиш клавиатуры
     addEventListener('keydown', changeDirection);
+}
+
+function createBomb() {
+    for (var i = 0; i < FIELD_SIZE_X; i++) {
+        for (var j = 0; j < FIELD_SIZE_Y; j++) {
+            var checked_cell = document.getElementsByClassName('cell-' + j + '-' + i)[0];
+            if (checked_cell.classList.contains('bomb-unit')) {
+                checked_cell.classList.remove('bomb-unit');
+            }
+        }
+    }
+
+    while (true) { //пока еду не создали
+        // рандом
+        var bomb_x = Math.floor(Math.random() * FIELD_SIZE_X);
+        var bomb_y = Math.floor(Math.random() * FIELD_SIZE_Y);
+
+        var bomb_cell = document.getElementsByClassName('cell-' + bomb_y + '-' + bomb_x)[0];
+
+        // проверка на змейку
+        if (!bomb_cell.classList.contains('snake-unit') && !bomb_cell.classList.contains('food-unit')) {
+            bomb_cell.classList.add('bomb-unit');
+            break;
+        }
+    }
 }
 
 /**
@@ -64,9 +90,10 @@ function prepareGameField() {
  */
 function startGame() {
     gameIsRunning = true;
-    respawn();//создали змейку
+    respawn(); //создали змейку
 
-    snake_timer = setInterval(move, SNAKE_SPEED);//каждые 200мс запускаем функцию move
+    snake_timer = setInterval(move, SNAKE_SPEED); //каждые 200мс запускаем функцию move
+    bomb_timer = setInterval(createBomb, 7000); //каждые 10000мс запускаем функцию createBomb
     setTimeout(createFood, 5000);
 }
 
@@ -85,14 +112,19 @@ function respawn() {
     var snake_head = document.getElementsByClassName('cell-' + start_coord_y + '-' + start_coord_x)[0];
     snake_head.setAttribute('class', snake_head.getAttribute('class') + ' snake-unit');
     // Тело змейки
-    var snake_tail = document.getElementsByClassName('cell-' + (start_coord_y-1) + '-' + start_coord_x)[0];
+    var snake_tail = document.getElementsByClassName('cell-' + (start_coord_y - 1) + '-' + start_coord_x)[0];
     snake_tail.setAttribute('class', snake_tail.getAttribute('class') + ' snake-unit');
 
     snake.push(snake_head);
     snake.push(snake_tail);
 }
 
-
+function unitContainsBomb(checked_cell) {
+    if (checked_cell.classList.contains('bomb-unit')) {
+        return true;
+    }
+    return false;
+}
 
 
 /**
@@ -101,25 +133,22 @@ function respawn() {
 function move() {
     //console.log('move',direction);
     // Сборка классов
-    var snake_head_classes = snake[snake.length-1].getAttribute('class').split(' ');
+    var snake_head_classes = snake[snake.length - 1].getAttribute('class').split(' ');
 
     // Сдвиг головы
     var new_unit;
-    var snake_coords = snake_head_classes[1].split('-');//преобразовали строку в массив
+    var snake_coords = snake_head_classes[1].split('-'); //преобразовали строку в массив
     var coord_y = parseInt(snake_coords[1]);
     var coord_x = parseInt(snake_coords[2]);
 
     // Определяем новую точку
     if (direction == 'x-') {
         new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (coord_x - 1))[0];
-    }
-    else if (direction == 'x+') {
+    } else if (direction == 'x+') {
         new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (coord_x + 1))[0];
-    }
-    else if (direction == 'y+') {
+    } else if (direction == 'y+') {
         new_unit = document.getElementsByClassName('cell-' + (coord_y - 1) + '-' + (coord_x))[0];
-    }
-    else if (direction == 'y-') {
+    } else if (direction == 'y-') {
         new_unit = document.getElementsByClassName('cell-' + (coord_y + 1) + '-' + (coord_x))[0];
     }
 
@@ -127,23 +156,22 @@ function move() {
     // 1) new_unit не часть змейки
     // 2) Змейка не ушла за границу поля
     //console.log(new_unit);
-    if (!isSnakeUnit(new_unit) && new_unit !== undefined) {
+    if (!isSnakeUnit(new_unit) && new_unit !== undefined && !unitContainsBomb(new_unit)) {
         // Добавление новой части змейки
         new_unit.setAttribute('class', new_unit.getAttribute('class') + ' snake-unit');
         snake.push(new_unit);
 
         // Проверяем, надо ли убрать хвост
 
-	   if (!haveFood(new_unit)) {
+        if (!haveFood(new_unit)) {
             // Находим хвост
-           var removed = snake.splice(0, 1)[0];
+            var removed = snake.splice(0, 1)[0];
             var classes = removed.getAttribute('class').split(' ');
 
             // удаляем хвост
             removed.setAttribute('class', classes[0] + ' ' + classes[1]);
         }
-    }
-    else {
+    } else {
         finishTheGame();
     }
 }
@@ -153,10 +181,10 @@ function move() {
  * @param unit
  * @returns {boolean}
  */
-function isSnakeUnit(unit) {//проверка, что змейка не попала сама в себя в новой ячейке
+function isSnakeUnit(unit) { //проверка, что змейка не попала сама в себя в новой ячейке
     var check = false;
 
-    if (snake.includes(unit)) {//если в змейке содержится новая ячейка, значит возникло пересечение
+    if (snake.includes(unit)) { //если в змейке содержится новая ячейка, значит возникло пересечение
         check = true;
     }
     return check;
@@ -216,7 +244,7 @@ function createFood() {
 function changeDirection(e) {
     console.log(e);
 
-	switch (e.keyCode) {
+    switch (e.keyCode) {
         case 37: // Клавиша влево
             if (direction != 'x+') {
                 direction = 'x-'
@@ -246,6 +274,7 @@ function changeDirection(e) {
 function finishTheGame() {
     gameIsRunning = false;
     clearInterval(snake_timer);
+    clearInterval(bomb_timer);
     alert('Вы проиграли! Ваш результат: ' + score.toString());
 }
 
@@ -256,9 +285,9 @@ function refreshGame() {
     location.reload();
 }
 
-function updateScoreField(){
+function updateScoreField() {
     var div = document.querySelector("#score");
-    div.textContent = "Количество очков: "+score;
+    div.textContent = "Количество очков: " + score;
 }
 
 // Инициализация
