@@ -142,6 +142,18 @@ function move() {
     var coord_x = parseInt(snake_coords[2]);
 
     // Определяем новую точку
+    // отработаем выход за границы поля
+    if (direction == 'x-' && coord_x == 0) {
+        coord_x = FIELD_SIZE_X;
+    } else if (direction == 'x+' && coord_x == (FIELD_SIZE_X-1)) {
+        coord_x = -1;
+    } else if (direction == 'y+' && coord_y == 0) {
+        coord_y = FIELD_SIZE_Y;
+    } else if (direction == 'y-' && coord_y == (FIELD_SIZE_Y-1)) {
+        coord_y = -1;
+    }
+
+
     if (direction == 'x-') {
         new_unit = document.getElementsByClassName('cell-' + (coord_y) + '-' + (coord_x - 1))[0];
     } else if (direction == 'x+') {
@@ -155,6 +167,7 @@ function move() {
     // Проверки
     // 1) new_unit не часть змейки
     // 2) Змейка не ушла за границу поля
+    // 3) new_unit не часть бомбы
     //console.log(new_unit);
     if (!isSnakeUnit(new_unit) && new_unit !== undefined && !unitContainsBomb(new_unit)) {
         // Добавление новой части змейки
